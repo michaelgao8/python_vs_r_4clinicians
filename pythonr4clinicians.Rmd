@@ -1,0 +1,246 @@
+---
+title: "Python vs R for Clinicians"
+author: "Michael Gao"
+date: "8/28/2018"
+output: html_document
+---
+```{r setup, include=FALSE}
+library(reticulate)
+use_python("/Users/michael/.pyenv/shims/python3")
+```
+# Python vs. R for Clinicians
+
+I get asked this question a lot as a data scientist working with clinicians and medical students. You, as a clinician, are a busy person, but you are curious and want to contribute to the future of technology in healthcare. You may have heard of Python and R as being the de-facto standard languages for data science. However, you, just like most people entering data science across the world are curious as to which language you should use.
+
+Here is a summary of my thoughts on this whole debate. For reference, I've been programming in R and Python for about 5 years now, specifically within the realm of data science in health care. Before I get to the actual content, I want to say the following:
+
+* Both of these languages are fully capable of doing data science
+* Neither language is categorically better than another
+
+That being said, there _are_ differences between the two languages and those differences may contribute to which you choose. If you are lazy and don't want to read the whole article:
+
+## tl;dr
+* If you are looking for a language to rapidly do data manipulation, visualization, reporting, and prototyping dashboards, pick R.
+* If you are looking to implement anything custom or want to put your analysis in production or need to interface with other peoples' code, pick Python
+* If you want to do something with neural networks, pick Python
+* If you want the latest hypothesis tests or statistical analysis, pick R
+* If you want to become a flexible data scientist, you should eventually learn both
+* If you have no programming background, and aren't that interested in getting really good at programming, pick R
+* If you have a programming background or want to become proficient at programming in general, pick Python
+
+Also, there is an infographic from datacamp that shows some of the differences between R and Python [here](http://res.cloudinary.com/dyd911kmh/image/upload/f_auto,q_auto:best/v1523009719/main-qimg-9dcf536c501455f073dfbc4e09798a51_vpijr0.png)
+
+However, I don't agree with some of the points made in the infographic, so take it with a grain of salt.
+
+## Structure
+
+What I plan to do over the course of this piece is to highlight the differences between R and Python and give my opinion about which language performs which function better. Again, these are just my opinions, so take them with a grain of salt.
+
+### First, a discussion of ecosystems
+
+It seems weird to begin with a discussion of add-ons and the community behind the two languages without even talking about the languages themselves to begin with. However, the community behind a programming language is actually one of the most important metrics of success and general usability of a language. Add-ons, known as `libraries` or `packages`, can turn languages that are frustrating to program in to languages that are a pleasure to write. My thoughts about the ecosystems of the two languages can be summarized quite succintly:
+
+R's ecosystem is very user-friendly and is specialized towards data manipulation, visualization, and statistical inference. In addition, R is primarily a data science language first and foremost, meaning most if not all of the packages are designed to fit within a data science framework.
+
+Python's data science ecosystem is also quite well developed. However, they sometimes are not as easy to use as R's packages. That being said, the trade-off is that python is much more flexible language than R. Because python's origins are as a general purpose language, it offers some functionality that is harder to replicate in R. 
+
+As a quick note, because this is something that comes up a lot: If you are looking to implement custom machine learning models, python is a better environment to do so. Most of the cutting-edge deep learning research is conducted in python. R has more packages geared towards complicated statistical techniques, such as those that arise in genetics research.
+
+With that, let's dive into examples of functionality in both languages so you can see for yourself which you prefer:
+
+## Data Manipulation and Munging
+Obviously, one of the things that you need to be able to do in either language is to work with the data itself. Let's start by reading in some data! 
+
+First up, R:
+
+### Reading in Data
+
+```{r}
+diabetes_data <- read.csv("./dataset_diabetes/diabetic_data.csv")
+head(diabetes_data) 
+```
+
+We'll use this dataset to illustrate some of the differences between using the base language and using packages to help us. Let's say we want to find which combinations of race and gender have more medications on average and sort them according to that number. In the base R language, we could do that like this:
+
+### Simple Aggregation
+
+```{r}
+# Base language
+result <- aggregate(diabetes_data$num_medications, by=list(diabetes_data$race, diabetes_data$gender), FUN=mean)
+
+result <- result[order(result$x, decreasing = TRUE),]
+
+head(result)
+```
+
+Some of the syntax can seem foreign at first glance. Luckily, the `dplyr` package makes this operation trivial, and more importantly, *readable*
+
+```{r}
+library(dplyr)
+result <- diabetes_data %>% 
+            group_by(race, gender) %>% 
+            summarize(average_medications = mean(num_medications)) %>% 
+            arrange(desc(average_medications))
+
+head(result)
+```
+
+In general, many of the packages that are available in R are user-friendly and powerful. The top packages are extremely well-designed in large part due to Hadley Wickham, who is a famous contributor to the R ecosystem and has really ensured that it has cemented its place as a core data science language.
+
+### Filtering
+```{r}
+filtering_example <- diabetes_data %>% 
+                        filter(gender == "Female") %>%
+                        filter(race == "Caucasian") %>%
+                        filter(num_medications > 8)
+
+head(filtering_example)
+```
+
+What about python?
+
+In python, the standard library that is used to work with data is known as `pandas`
+
+### Reading in Data
+
+```{python}
+import pandas as pd
+diabetes_data = pd.read_csv("./dataset_diabetes/diabetic_data.csv")
+print(diabetes_data.head())
+
+```
+
+### Simple Aggregation
+```{python}
+result = (diabetes_data
+            .groupby(['race', 'gender'], as_index = False)['num_medications']
+            .mean()
+            .sort_values(by = ['num_medications'], ascending = False))
+
+print(result.head(6))
+```
+
+`pandas` is a *very* powerful, but complex package. There are a lot of parameters to think about because of how flexible the package is. For example, things like the `as_index = False` call above can be hard to find if you don't know what you're looking for. That being said, pandas is extremely fast and is a powerful tool in the right hands.
+
+### Filtering
+```{python}
+filtering_example = (diabetes_data[
+                      (diabetes_data['gender'] == "Female") & 
+                      (diabetes_data['race'] == "Caucasian") &
+                      (diabetes_data['num_medications'] > 8)])
+print(filtering_example.head())
+```
+
+From personal experience, I would say that R, due to tools like `dplyr` and `tidyr` is a more friendly language for data manipulation and it is generally easier to figure out what you are doing. In addition, the `pandas` documentation is [huge](https://pandas.pydata.org/pandas-docs/stable/) and can be intimidating to new users. As a comparison, the are about 10 main functions that you need to learn in `dplyr`, whereas `pandas` contains hundreds of functions that all serve different purposes. 
+
+## Visualization
+
+Both R and Python are great at visualization. I honestly would call it almost a toss-up here. `ggplot2` is the standard plotting library in R and it is fantastic. Python's visualization frameworks are a bit more fragmented. The traditional standard for scientific plotting is known as `matplotlib` whereas some prettier graphs can be made using `seaborn`. For that reason, R *might* have the slight edge, although the difference is minimal.
+
+
+### R
+
+```{r}
+library(ggplot2)
+ggplot(data = diabetes_data) + 
+  geom_boxplot(aes(x = interaction(gender, race), y = num_medications, fill = gender)) +
+  labs(title = "Test Plot", x = "Gender + Race", y = "Number of Medications")
+  
+```
+
+Ok, the x-ticks are annoying. Fixing it requires a bit of complexity, so I'll go ahead and illustrate that as well. Oftentimes there are hiccups like this that can cause frustration when dealing with visualization, which happens in both python and R.
+
+```{r, fig.width = 11}
+library(stringr) # Work with strings! (characters) 
+
+# Full disclosure -- I found the solution at stackoverflow:
+# https://stackoverflow.com/questions/50047331/only-show-one-part-of-interacting-x-variable-in-x-axis-labels-in-ggplot 
+# Stackoverlow is the programming bible -- if you know how to properly phrase your question, chances is that someone has 
+# already answered it. Think of it like uptodate but for programmers
+
+make_labels <- function(labels) {
+  result <- str_split(labels, "\\.")
+  unlist(lapply(result, function(x) x[2]))
+}
+
+# This function takes in the 'labels' from the graph
+# Then, it splits them after the period and takes the 2nd part, which is what we want here.
+# the "\\." is what is known as a regular expression which is a great, but seeminlgy complex, tool for parsing strings
+# For more on regular expressions, you can read about them here: https://www.regular-expressions.info
+
+diabetes_viz <- ggplot(data = diabetes_data) + 
+  geom_boxplot(aes(x = interaction(gender, race), y = num_medications, fill = gender)) +
+  labs(title = "Test Plot", y = "Number of Medications") + scale_x_discrete(labels = make_labels, name = "Race") +      
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+diabetes_viz
+
+```
+### Python
+
+```{python}
+print("""
+import matplotlib.pyplot as plt
+import numpy as np
+t = np.arange(0.0, 2.0, 0.01)
+s = 1 + np.sin(2 * np.pi * t)
+
+fig, ax = plt.subplots()
+ax.plot(t, s)
+
+ax.set(xlabel='time (s)', ylabel='voltage (mV)',
+       title='About as simple as it gets, folks')
+ax.grid()
+plt.show()
+""")
+```
+
+
+## Machine Learning
+
+Machine Learning is a hot topic in healthcare and most other industries. Both R and Python offer excellent tools for machine learning. The two main packages that are used for machine learning in R and Python are `caret` and `Scikit-Learn`, respectively. Although they differ in their approaches, both are very usable. For most of the common machine learning techniques that were invented prior to 2010, you can probably find an implementation in these two packages. That includes things like, 
+ * Linear Regression
+ * Logistic Regression (regularized and not)
+ * Decision Trees
+ * Random Forests
+ * Support Vector Machines
+ * Multi-Layer Perceptrons (basic neural networks)
+ 
+If you're dealing with models like this, both python and R should be completely fine. However, if you want to start playing around with custom models, this is where python's ecosystem make it better. Almost no deep learning work occurs in R, because `Tensorflow`, which is google's neural network library, supports python a lot better.
+
+That being said, I wouldn't make a decision on which language to choose simply due to the machine learning frameworks available in either language. If you want to do something with medical images or natural language processing, python is the better choice. Otherwise, they are essentially identical.
+
+## Statistics
+
+R is better for statistics. Period. Most statisticians use R, and if there is a special type of hypothesis test or some other statistical analysis tool, it will most likely be implemented in R before it is implemented in python.
+
+If you are looking to do basic statistical analysis, both languages are fine. As soon as you venture into the world of custom statistical procedures, you're better off learning R.
+
+## Reporting on your work
+
+One underappreciated aspect of programming languages for data science is how to present your work. Here, I think R is the winner simply because of how easy to use it is. R has something known as R Markdown, which this entire article is written in! It allows you to have in-line code like you've seen and it has a bunch of bells and whistles for showing your work afterwards. For example, I can include interactive visualizations natively into these documents!
+
+```{r}
+# You can hover here for some cool effects!
+library(plotly) # package for interactive visualizations
+
+interactive_df <- ggplotly(diabetes_viz)
+interactive_df
+```
+
+Python has its own version of this type of framework, known as Jupyter Notebooks. Actually, Jupyter Notebooks can work with R also. However, they're not as easy to use, in my opinion. At this point in their development, both Rmarkdown and Jupyter Notebooks have similar functionality, it all comes down ease of use. You can find out more about jupyter notebooks [here](http://jupyter.org/). 
+
+## Web-Apps 
+
+What if you want to present a web application of your analysis? Here, I think R's web-app framework, known as `shiny` is great. It allows you to rapidly spin up applications that feature interactive visualizations that offer easy hosting. Python's versions of this are much more fragmented, and may require more pre-requisite knowledge and more of a programming background to set up. There are general web-app frameworks like `django` and `flask`, which are definitely not suited to beginning data science programmers. `dash`, which is made by `plotly` for python, offers similar functionality to `shiny`, but it is nowhere near as robust. You can find really cool examples of modules that you can integrate seamlessly into shiny apps [here](htmlwidgets.org)
+
+## Installing packages
+
+The two languages differ quite a bit when it comes to installation of packages/libraries. In R, you can install any package you want by simply opening an R console and typing `install.packages('<name of your package>')`. In python, you do this from the command line, and there are lots of different ways to install packages. For example, two common package managers are [`conda`](https://conda.io/docs/) and [`pip`](https://pypi.org/project/pip/). The trade-off here is pretty clear. Python's package management is more fragmented, but gives you greater control about what versions of packages you have installed. So for example, let's say you're using python version 2.7 and you want pandas version 1.10. That is something that you can easily do in python. R, however, doesn't really encourage this as much as Python. That may be due to the fact that R updates rarely break old code (in my experience). In addition, most code written in prior versions of packages continue to function down the line. However, if you are putting some code into production, that is definitely not a viable solution. This whole scenario echoes the general differences behind R and Python's main users: R tends to attract data scientists and researchers doing one-off analyses whereas python attracts engineers and people looking to do custom work and putting it into production.
+
+
+
+
+
+
+
+
