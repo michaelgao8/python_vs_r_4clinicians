@@ -1,12 +1,11 @@
 ---
 title: "Python vs R for Clinicians"
 author: "Michael Gao"
-date: "8/28/2018"
 output: 
   html_document:
       toc: true
       toc_float: true
-      theme: paper
+      theme: journal
       
 ---
 ```{r setup, include=FALSE}
@@ -14,7 +13,7 @@ library(reticulate)
 use_python("/usr/lib/python")
 knitr::knit_engines$set(python = reticulate::eng_python)
 ```
-# Python vs. R for Clinicians
+## Intro
 
 I get asked this question a lot as a data scientist working with clinicians and medical students. You, as a clinician, are a busy person, but you are curious and want to contribute to the future of technology in healthcare. You may have heard of Python and R as being the de-facto standard languages for data science. However, you, just like most people entering data science across the world are curious as to which language you should use.
 
@@ -51,7 +50,7 @@ What I plan to do over the course of this piece is to highlight the differences 
  * Web-Applications
  * Development Environments
 
-### First, a discussion of ecosystems
+## First, a discussion of ecosystems
 
 It might seems strange to begin with a discussion of add-ons and the community behind the two languages without even talking about the languages themselves to begin with. However, the community behind a programming language is actually one of the most important metrics of success and general usability of a language. Add-ons, known as `libraries` or `packages`, can turn languages that are frustrating to program in to languages that are a pleasure to write. My thoughts about the ecosystems of the two languages can be summarized quite succintly:
 
@@ -91,7 +90,7 @@ head(result)
 ```
 Some of the syntax can seem foreign at first glance. Luckily, the `dplyr` package makes this operation trivial, and more importantly, *readable*
 
-```{r}
+```{r, message=FALSE}
 library(dplyr) # Import the dplyr library
 result <- diabetes_data %>% 
             group_by(race, gender) %>% 
@@ -127,13 +126,6 @@ print(diabetes_data.head())
 ```
 
 ### Simple Aggregation
-I get asked this question a lot as a data scientist working with clinicians and medical students. You, as a clinician, are a busy person, but you are curious and want to contribute to the future of technology in healthcare. You may have heard of Python and R as being the de-facto standard languages for data science. However, you, just like most people entering data science across the world are curious as to which language you should use.
-
-Here is a summary of my thoughts on this whole debate. For reference, I’ve been programming in R and Python for about 5 years now, specifically within the realm of data science in health care. Before I get to the actual content, I want to say the following:
-
-Both of these languages are fully capable of doing data science
-Neither language is categorically better than another
-That being said, there are differences between the two languages and those differences may contribute to which you choose. If you are lazy and don’t want to read the whole article:
 
 
 ```{python}
@@ -229,6 +221,7 @@ Visualization can be tedious in any language just because of the sheer amount of
 ## Machine Learning
 
 Machine Learning is a hot topic in healthcare and most other industries. Both R and Python offer excellent tools for machine learning. The two main packages that are used for machine learning in R and Python are `caret` and `Scikit-Learn`, respectively. Although they differ in their approaches, both are very usable. For most of the common machine learning techniques that were invented prior to 2010, you can probably find an implementation in these two packages. That includes things like, 
+
  * Linear Regression
  * Logistic Regression (regularized and not)
  * Decision Trees
@@ -250,7 +243,7 @@ If you are looking to do basic statistical analysis, both languages are fine. As
 
 One underappreciated aspect of programming languages for data science is how to present your work. Here, I think R is the winner simply because of how easy to use it is. R has something known as R Markdown, which this entire article is written in! It allows you to have in-line code like you've seen and it has a bunch of bells and whistles for showing your work afterwards. For example, I can include interactive visualizations natively into these documents!
 
-```{r}
+```{r, message=FALSE}
 # You can hover here for some cool effects!
 library(plotly) # package for interactive visualizations
 
@@ -279,7 +272,7 @@ An IDE is where most people write their data science programs and scripts. For R
 
 Rstudio can be downloaded [here](https://www.rstudio.com/products/RStudio/) whereas instructions for installing jupyter notebooks can be found [here](http://jupyter.org/install)
 
-# Conclusion
+## Conclusion
 
 Hopefully this has exposed you a little bit to the differences between R and Python and ways that they are similar. In my opinion, it is difficult to make a _wrong_ choice here. A lot of the process of learning tranfers directly between the two languages. If you are just getting started, I would suggest just making a decision and sticking with it. If you have any questions, or feedback (things you'd like to see added, etc.), feel free to email me at michael.gao@duke.edu
 
