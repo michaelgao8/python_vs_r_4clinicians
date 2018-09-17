@@ -20,13 +20,14 @@ Here is a summary of my thoughts on this whole debate. For reference, I've been 
 That being said, there _are_ differences between the two languages and those differences may contribute to which you choose. If you are lazy and don't want to read the whole article:
 
 ## tl;dr
-* If you are looking for a language to rapidly do data manipulation, visualization, reporting, and prototyping dashboards, pick R.
-* If you are looking to implement anything custom or want to put your analysis in production or need to interface with other peoples' code, pick Python
-* If you want to do something with neural networks, pick Python
-* If you want the latest hypothesis tests or statistical analysis, pick R
-* If you want to become a flexible data scientist, you should eventually learn both
-* If you have no programming background, and aren't that interested in getting really good at programming, pick R
-* If you have a programming background or want to become proficient at programming in general, pick Python
+
+ * If you are looking for a language to rapidly do data manipulation, visualization, reporting, and prototyping dashboards, pick R.
+ * If you are looking to implement anything custom or want to put your analysis in production or need to interface with other peoples' code, pick  Python
+ * If you want to do something with neural networks, pick Python
+ * If you want the latest hypothesis tests or statistical analysis, pick R
+ * If you want to become a flexible data scientist, you should eventually learn both
+ * If you have no programming background, and aren't that interested in getting really good at programming, pick R
+ * If you have a programming background or want to become proficient at programming in general, pick Python
 
 Also, there is an infographic from datacamp that shows some of the differences between R and Python [here](http://res.cloudinary.com/dyd911kmh/image/upload/f_auto,q_auto:best/v1523009719/main-qimg-9dcf536c501455f073dfbc4e09798a51_vpijr0.png)
 
@@ -38,7 +39,7 @@ What I plan to do over the course of this piece is to highlight the differences 
 
 ### First, a discussion of ecosystems
 
-It seems weird to begin with a discussion of add-ons and the community behind the two languages without even talking about the languages themselves to begin with. However, the community behind a programming language is actually one of the most important metrics of success and general usability of a language. Add-ons, known as `libraries` or `packages`, can turn languages that are frustrating to program in to languages that are a pleasure to write. My thoughts about the ecosystems of the two languages can be summarized quite succintly:
+It might seems strange to begin with a discussion of add-ons and the community behind the two languages without even talking about the languages themselves to begin with. However, the community behind a programming language is actually one of the most important metrics of success and general usability of a language. Add-ons, known as `libraries` or `packages`, can turn languages that are frustrating to program in to languages that are a pleasure to write. My thoughts about the ecosystems of the two languages can be summarized quite succintly:
 
 R's ecosystem is very user-friendly and is specialized towards data manipulation, visualization, and statistical inference. In addition, R is primarily a data science language first and foremost, meaning most if not all of the packages are designed to fit within a data science framework.
 
@@ -237,8 +238,9 @@ What if you want to present a web application of your analysis? Here, I think R'
 
 The two languages differ quite a bit when it comes to installation of packages/libraries. In R, you can install any package you want by simply opening an R console and typing `install.packages('<name of your package>')`. In python, you do this from the command line, and there are lots of different ways to install packages. For example, two common package managers are [`conda`](https://conda.io/docs/) and [`pip`](https://pypi.org/project/pip/). The trade-off here is pretty clear. Python's package management is more fragmented, but gives you greater control about what versions of packages you have installed. So for example, let's say you're using python version 2.7 and you want pandas version 1.10. That is something that you can easily do in python. R, however, doesn't really encourage this as much as Python. That may be due to the fact that R updates rarely break old code (in my experience). In addition, most code written in prior versions of packages continue to function down the line. However, if you are putting some code into production, that is definitely not a viable solution. This whole scenario echoes the general differences behind R and Python's main users: R tends to attract data scientists and researchers doing one-off analyses whereas python attracts engineers and people looking to do custom work and putting it into production.
 
+## Integrated Development Environment (IDE)
 
-
+An IDE is where most people write their data science programs and scripts. For R, the main IDE is RStudio. RStudio is one of the best IDEs in existence. It has everything a modern IDE should have and is custom-tailored for R. For python, the main IDEs for Data Science are Jupyter Notebooks and Spyder. There are many others that are probably better suited for software development, but those are the main 2 for python. Jupyter Lab, which includes Jupyter Notebooks as a subset, is also getting better in terms of its functionality, but I would say that R wins hands-down in this department. 
 
 
 
