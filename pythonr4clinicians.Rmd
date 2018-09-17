@@ -2,11 +2,17 @@
 title: "Python vs R for Clinicians"
 author: "Michael Gao"
 date: "8/28/2018"
-output: html_document
+output: 
+  html_document:
+      toc: true
+      toc_float: true
+      theme: paper
+      
 ---
 ```{r setup, include=FALSE}
 library(reticulate)
-use_python("/Users/michael/.pyenv/shims/python3")
+use_python("/usr/lib/python")
+knitr::knit_engines$set(python = reticulate::eng_python)
 ```
 # Python vs. R for Clinicians
 
@@ -35,7 +41,15 @@ However, I don't agree with some of the points made in the infographic, so take 
 
 ## Structure
 
-What I plan to do over the course of this piece is to highlight the differences between R and Python and give my opinion about which language performs which function better. Again, these are just my opinions, so take them with a grain of salt.
+What I plan to do over the course of this piece is to highlight the differences between R and Python and give my opinion about which language performs which function better. Here's a rough outline:
+
+ * Language ecosystem and community
+ * Data Cleaning
+ * Visualization
+ * Statistics and Machine Learning
+ * Reporting
+ * Web-Applications
+ * Development Environments
 
 ### First, a discussion of ecosystems
 
@@ -46,13 +60,15 @@ R's ecosystem is very user-friendly and is specialized towards data manipulation
 Python's data science ecosystem is also quite well developed. However, they sometimes are not as easy to use as R's packages. That being said, the trade-off is that python is much more flexible language than R. Because python's origins are as a general purpose language, it offers some functionality that is harder to replicate in R. 
 
 As a quick note, because this is something that comes up a lot: If you are looking to implement custom machine learning models, python is a better environment to do so. Most of the cutting-edge deep learning research is conducted in python. R has more packages geared towards complicated statistical techniques, such as those that arise in genetics research.
+This actually reflects the main differences between users between the two languages. Traditionally, academics and researchers have preferred to use R due to all of the statistical packages that are available. People coming from software engineering backgrounds tend to prefer python because of its flexibility as a general-purpose programming language.
+
 
 With that, let's dive into examples of functionality in both languages so you can see for yourself which you prefer:
 
 ## Data Manipulation and Munging
 Obviously, one of the things that you need to be able to do in either language is to work with the data itself. Let's start by reading in some data! 
 
-First up, R:
+#### First up, R:
 
 ### Reading in Data
 
@@ -73,11 +89,10 @@ result <- result[order(result$x, decreasing = TRUE),]
 
 head(result)
 ```
-
 Some of the syntax can seem foreign at first glance. Luckily, the `dplyr` package makes this operation trivial, and more importantly, *readable*
 
 ```{r}
-library(dplyr)
+library(dplyr) # Import the dplyr library
 result <- diabetes_data %>% 
             group_by(race, gender) %>% 
             summarize(average_medications = mean(num_medications)) %>% 
@@ -86,7 +101,7 @@ result <- diabetes_data %>%
 head(result)
 ```
 
-In general, many of the packages that are available in R are user-friendly and powerful. The top packages are extremely well-designed in large part due to Hadley Wickham, who is a famous contributor to the R ecosystem and has really ensured that it has cemented its place as a core data science language.
+In general, many of the packages that are available in R are user-friendly and powerful. The top packages are extremely well-designed in large part due to Hadley Wickham, who is a famous contributor to the R ecosystem and has really ensured that it has cemented its place as a core data science language. 
 
 ### Filtering
 ```{r}
@@ -98,9 +113,9 @@ filtering_example <- diabetes_data %>%
 head(filtering_example)
 ```
 
-What about python?
+#### What about python?
 
-In python, the standard library that is used to work with data is known as `pandas`
+In python, the standard library that is used to work with data is known as `pandas`.
 
 ### Reading in Data
 
@@ -112,16 +127,25 @@ print(diabetes_data.head())
 ```
 
 ### Simple Aggregation
+I get asked this question a lot as a data scientist working with clinicians and medical students. You, as a clinician, are a busy person, but you are curious and want to contribute to the future of technology in healthcare. You may have heard of Python and R as being the de-facto standard languages for data science. However, you, just like most people entering data science across the world are curious as to which language you should use.
+
+Here is a summary of my thoughts on this whole debate. For reference, I’ve been programming in R and Python for about 5 years now, specifically within the realm of data science in health care. Before I get to the actual content, I want to say the following:
+
+Both of these languages are fully capable of doing data science
+Neither language is categorically better than another
+That being said, there are differences between the two languages and those differences may contribute to which you choose. If you are lazy and don’t want to read the whole article:
+
+
 ```{python}
-result = (diabetes_data
+diabetes_python = (diabetes_data
             .groupby(['race', 'gender'], as_index = False)['num_medications']
             .mean()
             .sort_values(by = ['num_medications'], ascending = False))
 
-print(result.head(6))
+print(diabetes_python.head(6))
 ```
 
-`pandas` is a *very* powerful, but complex package. There are a lot of parameters to think about because of how flexible the package is. For example, things like the `as_index = False` call above can be hard to find if you don't know what you're looking for. That being said, pandas is extremely fast and is a powerful tool in the right hands.
+`pandas` is a *very* powerful, but complex package. There are a lot of parameters to think about because of how flexible the package is. For example, things like the `as_index = False` call above can be hard to find if you don't know what you're looking for. To find that particular case, you would have to look at the documentation for the `groupby` function, which is located [here](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.groupby.html). I would recommend that you take a look to see how many ways you can modify this function with parameters. You can compare that to `dplyr`'s reference [here](https://dplyr.tidyverse.org/reference/group_by.html).
 
 ### Filtering
 ```{python}
@@ -140,6 +164,7 @@ Both R and Python are great at visualization. I honestly would call it almost a 
 
 
 ### R
+Let's try an example in `ggplot2`! 
 
 ```{r}
 library(ggplot2)
@@ -152,7 +177,7 @@ ggplot(data = diabetes_data) +
 Ok, the x-ticks are annoying. Fixing it requires a bit of complexity, so I'll go ahead and illustrate that as well. Oftentimes there are hiccups like this that can cause frustration when dealing with visualization, which happens in both python and R.
 
 ```{r, fig.width = 11}
-library(stringr) # Work with strings! (characters) 
+library(stringr) # Work with strings! (characters) 
 
 # Full disclosure -- I found the solution at stackoverflow:
 # https://stackoverflow.com/questions/50047331/only-show-one-part-of-interacting-x-variable-in-x-axis-labels-in-ggplot 
@@ -176,25 +201,30 @@ diabetes_viz <- ggplot(data = diabetes_data) +
 diabetes_viz
 
 ```
+
 ### Python
 
+In python, the main plotting libraries are `matplotlib` and `seaborn`. Matplotlib is generally used for quick graphs to visualize some data that you aren't going to present, since it doesn't generally look as nice. Although matplotlib can be used to visualize data that does not come from a Pandas DataFrame, Pandas actually has some nice built-in tools to help the process.
+
 ```{python}
-print("""
 import matplotlib.pyplot as plt
-import numpy as np
-t = np.arange(0.0, 2.0, 0.01)
-s = 1 + np.sin(2 * np.pi * t)
+diabetes_python.boxplot(['num_medications'], by = ['race', 'gender'])
+```
+![](./matplotlib_example.png)
 
-fig, ax = plt.subplots()
-ax.plot(t, s)
+As you can see, however, this doesn't really look good. Although matplotlib allows you to customize virtually every aspect of this figure, it can often be easier to just use `seaborn`, which is a way to create prettier visualizations: 
 
-ax.set(xlabel='time (s)', ylabel='voltage (mV)',
-       title='About as simple as it gets, folks')
-ax.grid()
-plt.show()
-""")
+
+```{python}
+import seaborn as sns
+sns_example = sns.boxplot(x = 'race', y = 'num_medications', hue = 'gender', data = diabetes_python)
 ```
 
+![](./seaborn_example.png)
+
+I made the figure bigger this time so the x-ticks wouldn't run into each other, but there are custom ways of dealing with this in python as well. 
+
+Visualization can be tedious in any language just because of the sheer amount of customizability that is almost mandatory to make the figures _exactly_ the way you want. Since visualization is so important, the libraries used to create them are generally very well-written and documented, so there isn't really a wrong way to go here. 
 
 ## Machine Learning
 
@@ -232,7 +262,12 @@ Python has its own version of this type of framework, known as Jupyter Notebooks
 
 ## Web-Apps 
 
-What if you want to present a web application of your analysis? Here, I think R's web-app framework, known as `shiny` is great. It allows you to rapidly spin up applications that feature interactive visualizations that offer easy hosting. Python's versions of this are much more fragmented, and may require more pre-requisite knowledge and more of a programming background to set up. There are general web-app frameworks like `django` and `flask`, which are definitely not suited to beginning data science programmers. `dash`, which is made by `plotly` for python, offers similar functionality to `shiny`, but it is nowhere near as robust. You can find really cool examples of modules that you can integrate seamlessly into shiny apps [here](htmlwidgets.org)
+What if you want to present a web application of your analysis? Here, I think R's web-app framework, known as `shiny` is great. It allows you to rapidly spin up applications that feature interactive visualizations that offer easy hosting. Python's versions of this are much more fragmented, and may require more pre-requisite knowledge and more of a programming background to set up. There are general web-app frameworks like `django` and `flask`, which are definitely not suited to beginning data science programmers. `dash`, which is made by `plotly` for python, offers similar functionality to `shiny`, but it is nowhere near as robust. You can find really cool examples of modules that you can integrate seamlessly into shiny apps [here](htmlwidgets.org). Here are some links that you can use to check out for examples of `shiny` apps and `dash` apps, which I would say is a fair comparison:
+
+[shiny](https://shiny.rstudio.com/gallery/)
+[dash](https://dash.plot.ly/gallery)
+
+R, with its `Shiny` infrastructure, definitely wins in terms of ease-of-use here. 
 
 ## Installing packages
 
@@ -242,7 +277,11 @@ The two languages differ quite a bit when it comes to installation of packages/l
 
 An IDE is where most people write their data science programs and scripts. For R, the main IDE is RStudio. RStudio is one of the best IDEs in existence. It has everything a modern IDE should have and is custom-tailored for R. For python, the main IDEs for Data Science are Jupyter Notebooks and Spyder. There are many others that are probably better suited for software development, but those are the main 2 for python. Jupyter Lab, which includes Jupyter Notebooks as a subset, is also getting better in terms of its functionality, but I would say that R wins hands-down in this department. 
 
+Rstudio can be downloaded [here](https://www.rstudio.com/products/RStudio/) whereas instructions for installing jupyter notebooks can be found [here](http://jupyter.org/install)
 
+# Conclusion
+
+Hopefully this has exposed you a little bit to the differences between R and Python and ways that they are similar. In my opinion, it is difficult to make a _wrong_ choice here. A lot of the process of learning tranfers directly between the two languages. If you are just getting started, I would suggest just making a decision and sticking with it. If you have any questions, or feedback (things you'd like to see added, etc.), feel free to email me at michael.gao@duke.edu
 
 
 
